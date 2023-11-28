@@ -1,0 +1,13 @@
+{% if messages %}
+    {% for message in messages %}
+        <p class="alert alert-{{ message.tags }}">{{ message }}</p>
+    {% endfor %}
+{% endif %}
+
+
+
+<!-- {% if massages %}
+    {% for msg in massages %}
+        <p class="alert alert-{{ msg.tags }}"> {{ msg }} </p>
+    {% endfor %}
+{% endif %} -->

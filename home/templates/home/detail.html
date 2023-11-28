@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+    
+    {% block content %} 
+
+      
+        {%if  request.user.id == post.user.id%}
+        <a href="{% url 'home:post_delete' post.id %}"  class="btn btn-danger" > Delete </a>
+        <a href="{% url 'home:post_update' post.id %}"  class="btn btn-info" > Update </a>
+        {% endif %}
+        
+        <a href="{% url  'account:user_profile' post.user.id %}"> {{post.user.username}}  </a>
+        <p> {{post.user.username}} - {{post.updated | date:"Y-M"}} </p>
+        <p> {{post.user.email}} </p>
+        <p> {{post.body}} </p>
+        <hr/>
+
+        {% if request.user.is_authenticated %}
+
+            <form action="" method="post" >
+                
+
+                <a href="{% url 'home:post_like'  post.id %}" class=" {%if can_like %} disabled {%endif%} btn btn-primary col-md-2" >Like {{post.likes_count}} </a>
+
+                {% csrf_token %}
+                {{ form.as_p }}
+                <input type="submit" value="send" >
+                
+                <br>
+
+            </form>
+            
+        {% else %}
+            <p class="alert alert-danger"> Only logged in user can comment </p>
+        {% endif %}
+
+   
+        <br>
+        
+        {% if comments.count == 1 %}
+            <h3>{{ comments.count }} comment</h3>
+            
+        {% elif comments.count == 0  %}
+            <h3> </h3>
+        {% else %}
+            <h3>{{ comments.count }} comments</h3>
+        {% endif %}
+
+        <br>
+
+        {% for comment in comments %}
+            <div class="card bg-dark text-white" >
+                <p class="card-header"> {{comment.user}} - {{ comment.created |timesince }}  </p>
+                <p class="card-body"> {{comment.body}} </p>
+                <br>
+                {% if request.user.is_authenticated %}
+                    <form action="{% url 'home:add_reply' post.id comment.id %}"  method="POST" >  <!--style="display: none;"-->
+                        {% csrf_token %}
+                        {{reply_form.as_p}}
+                        <input type="submit" value="reply" >
+                    </form>
+                {% endif %}
+                {% with replies=comment.rcomment.all %} <!-- برای وقتی که کد بلنده ، کل عبارت رو براش الیاس قرار میدیم -->
+                    {% for reply in replies %}
+                    <p class="bg-primary p-3 m-2 "> {{reply.user}} - {{reply.body}}</p> 
+
+                    {% endfor %}
+                {% endwith %}
+
+            </div>
+            <br>
+        {% empty %}
+            <p> No comments yet !</p>
+        {% endfor %}
+        
+
+
+
+    {% endblock %}
